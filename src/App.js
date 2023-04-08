@@ -15,6 +15,7 @@ const stages = [
   {id:3,name:"end"}
 ]
 
+const gussesQty = 3
 
 function App() {
 
@@ -27,7 +28,7 @@ function App() {
 
   const [guessedLetters,setGuessdLetters] = useState([])
   const [wrongLetters,setWrongLetters] = useState([])
-  const [guesses,setGuesses] = useState(3)
+  const [guesses,setGuesses] = useState(gussesQty)
   const [score,seScore] = useState()
 
   const picWordAndCategory = () =>{
@@ -77,11 +78,15 @@ function App() {
         ...prevState,
         normalizedLetter
       ]))
+
+      setGuesses((prevState) => prevState - 1)
     }
-
   
+  }
 
-  
+  const cleanData = ()  => {
+    setGuessdLetters([])
+    setWrongLetters([])
   }
 
   useEffect(() => {
@@ -92,7 +97,7 @@ function App() {
   // resetar gamer
   const retry = () => {
     setStage(stages[0].name)
-    setGuesses(3)
+    setGuesses(gussesQty)
 
   }
   return (
