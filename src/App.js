@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './App.css';
 // Compponentes
 import StartScreen from './Componentes/StartScreen';
@@ -14,6 +14,8 @@ const stages = [
   {id:2,name:"game"},
   {id:3,name:"end"}
 ]
+
+
 function App() {
 
   const [gameStage,setStage] = useState(stages[0].name)
@@ -22,6 +24,11 @@ function App() {
   const [PickedWord,setPickedWord] = useState()
   const [PickedCategory,setPickedCategory] = useState()
   const [letter,setLetter] = useState([])
+
+  const [guessedLetters,setGuessdLetters] = useState([])
+  const [wrongLetters,setWrongLetters] = useState([])
+  const [guesses,setGuesses] = useState(3)
+  const [score,seScore] = useState()
 
   const picWordAndCategory = () =>{
     const categorias = Object.keys(words)
@@ -37,25 +44,69 @@ function App() {
 
     let wordLetters = word.split("")
     wordLetters = wordLetters.map((l) => l.toLowerCase())
-    console.log(wordLetters)
+    setPickedWord(word)
+    setPickedCategory(category)
+    setLetter(wordLetters)
     setStage(stages[1].name)
 
   }
+    console.log(letter)
   
   //process the latter input
-  const verifLetter = () => {
-    setStage(stages[2].name)
+  const verifLetter = (letters) => {
+   
+    const normalizedLetter = letters.toLowerCase()
+
+    if(
+      guessedLetters.includes(normalizedLetter) ||
+      wrongLetters.includes(normalizedLetter)
+    )
+    {
+      return
+    }
+
+    if(letter.includes(normalizedLetter)){
+      setGuessdLetters((prevState) => 
+        [
+          ...prevState,
+          normalizedLetter
+        ]
+      )
+    } else{
+      setWrongLetters((prevState => [
+        ...prevState,
+        normalizedLetter
+      ]))
+    }
+
+  
+
+  
   }
 
+  useEffect(() => {
+    if(guesses<=0){
+      setStage(stages[2].name)
+    }
+  },[guesses])
   // resetar gamer
   const retry = () => {
     setStage(stages[0].name)
+    setGuesses(3)
 
   }
   return (
     <div className="App">
       {gameStage === "start" && <StartScreen startGamer={startGamer}/>}
-      {gameStage === "game" &&  <Game verifLetter={verifLetter}/>}
+      {gameStage === "game" &&  <Game 
+      PickedWord={PickedWord} 
+      PickedCategory={PickedCategory} 
+      letter={letter} 
+      guessedLetters={guessedLetters}
+      wrongLetters={wrongLetters}
+      guesses={guesses}
+      score={score}
+      verifLetter={verifLetter}/>}
       {gameStage === "end" && <Over retry={retry}/>}
     </div>
   );
